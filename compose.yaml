@@ -9,3 +9,18 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dash -d friends_dash"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./apps/api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://dash:dashpass@db:5432/friends_dash
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
