@@ -7,6 +7,7 @@ from ..db import get_db
 from ..models import User, Item
 from ..auth.router import get_current_user
 from .schemas import ItemCreate, ItemUpdate, ItemOut, Kind
+from ..realtime import broadcaster
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -16,6 +17,7 @@ async def create_item(data: ItemCreate, db: AsyncSession = Depends(get_db),
     item = Item(**data.model_dump(), created_by=user.id)
     db.add(item)
     await db.commit()
+    await broadcaster.publish({"type": "items_changed"})
     await db.refresh(item)
     return item
 
@@ -49,6 +51,7 @@ async def update_item(item_id: uuid.UUID, data: ItemUpdate,
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(item, field, value)
     await db.commit()
+    await broadcaster.publish({"type": "items_changed"})
     await db.refresh(item)
     return item
 
@@ -62,3 +65,4 @@ async def delete_item(item_id: uuid.UUID, db: AsyncSession = Depends(get_db),
         raise HTTPException(status_code=403, detail="Not your item")  # only the creator can delete
     await db.delete(item)
     await db.commit()
+    await broadcaster.publish({"type": "items_changed"})

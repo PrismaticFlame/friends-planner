@@ -1,20 +1,31 @@
 import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listItems, createItem, deleteItem, clearToken, type Item } from "./api";
+import { useRealtime } from "./useRealtime";
 
 export function Dashboard({ onLogout }: { onLogout: () => void }) {
-    const [items, setItems] = useState<Item[]>([]);
+    const qc = useQueryClient();
     const [title, setTitle] = useState("");
     const [kind, setKind] = useState("task");
 
-    const refresh = async () => setItems(await listItems());
-    useEffect(() => { refresh(); }, []);
+    useRealtime();
 
-    async function add() {
+    const { data: items = [], isLoading } = useQuery<Item[]>({
+        queryKey: ["items"],
+        queryFn: () => listItems(),
+    });
+
+    const invalidate = () => qc.invalidateQueries({ queryKey: ["items"] });
+    const create = useMutation({ mutationFn: createItem, onSuccess: invalidate });
+    const remove = useMutation({ mutationFn: deleteItem, onSuccess: invalidate });
+
+    function add() {
         if (!title.trim()) return;
-        await createItem({ kind, title });
+        create.mutate({ kind, title });
         setTitle("");
-        refresh();
     }
+
+    if (isLoading) return <p>Loading...</p>;
 
     return (
         <div>
@@ -31,7 +42,7 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
                 {items.map((item) => (
                     <li key={item.id}>
                         [{item.kind}] {item.title}
-                        <button onClick={async () => { await deleteItem(item.id); refresh(); }}>x</button>
+                        <button onClick={() => remove.mutate(item.id)}>x</button>
                     </li>
                 ))}
             </ul>

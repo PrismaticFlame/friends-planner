@@ -4,6 +4,7 @@ from sqlalchemy import text
 from .db import Session
 from .auth.router import router as auth_router
 from .items.router import router as items_router
+from .realtime import router as events_router
 
 app = FastAPI()
 
@@ -17,6 +18,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(items_router)
+app.include_router(events_router)
 
 @app.get("/health")
 async def health():
