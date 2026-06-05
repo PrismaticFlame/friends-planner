@@ -5,6 +5,7 @@ import { useRealtime } from "./useRealtime";
 import { ListView } from "./views/ListView";
 import { BoardView } from "./views/BoardView";
 import { CalendarView } from "./views/CalendarView";
+import logo from "./assets/hermes_logo_white.png";
 
 type View = "list" | "board" | "calendar";
 
@@ -70,28 +71,41 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     if (isLoading) return <p>Loading...</p>;
 
     return (
-        <div>
-            <button onClick={() => { clearToken(); onLogout(); }}>Log out</button>
-            <h2>Dashboard</h2>
+        <div className="min-h-screen px-4 py-6 md:px-8">
+            <header className="mx-auto mb-6 flex max-w-5x1 items-center justify-between">
+                <img src={logo} alt="Hermes" className="h-40" />
+                <button onClick={() => { clearToken(); onLogout(); }}
+                    className="text-sm text-white/70 transition hover:text-white">Log out</button>
+            </header>
 
-            <select value={kind} onChange={(e) => setKind(e.target.value)}>
-                <option value="task">Task</option>
-                <option value="event">Event</option>
-                <option value="outing">Outing</option>
-            </select>
-            <input placeholder="title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} />
-            <button onClick={add}>Add</button>
+            <main className="glass mx-auto max-w-5x1 p-6">
+                <div className="mb-6 flex flex-wrap items-center gap-3">
+                    <select className="field" value={kind} onChange={(e) => setKind(e.target.value)}>
+                        <option value="task">Task</option>
+                        <option value="event">Event</option>
+                        <option value="outing">Outing</option>
+                    </select>
+                    <input className="field min-w-[12rem] flex-1" placeholder="What's the plan?"
+                           value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <input className="field" type="datetime-local" value={when}
+                           onChange={(e) => setWhen(e.target.value)} />
+                    <button className="btn" onClick={add}>Add</button>
+                </div>
 
-            <div style={{ margin: "1rem 0" }}>
-                <button onClick={() => setView("list")} disabled={view === "list"}>List</button>
-                <button onClick={() => setView("board")} disabled={view === "board"}>Board</button>
-                <button onClick={() => setView("calendar")} disabled={view === "calendar"}>Calendar</button>
-            </div>
+                <div className="mb-6 inline-flex rounded-x1 border border-white/10 bg-white/5 p-1">
+                    {(["list", "board", "calendar"] as const).map((v) => (
+                        <button key={v} onClick={() => setView(v)}
+                        className={`rounded-lg px-4 py-1.5 text-sm capitalize transition ${
+                            view === v ? "bg-white/15 text-white" : "text-white/60 hover:text-white"}`}>
+                        {v}
+                        </button>
+                    ))}
+                </div>
 
-            {view === "list" && <ListView items={items} onDelete={remove.mutate} />}
-            {view === "board" && <BoardView items={items} onDelete={remove.mutate} />}
-            {view === "calendar" && <CalendarView items={items} onDelete={remove.mutate} />}
+                {view === "list" && <ListView items={items} onDelete={remove.mutate} />}
+                {view === "board" && <BoardView items={items} onDelete={remove.mutate} />}
+                {view === "calendar" && <CalendarView items={items} onDelete={remove.mutate} />}
+            </main>
         </div>
     );
 }
