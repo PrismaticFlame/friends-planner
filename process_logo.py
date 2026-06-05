@@ -18,3 +18,9 @@ white.putalpha(alpha)
 white = white.crop(bbox)
 white.save("hermes_logo_white.png")
 print(f"Saved hermes_logo_white.png ({white.width}x{white.height})")
+
+gold = Image.new("RGBA", gray.size, (212, 175, 55, 0))  # metallic gold
+gold.putalpha(alpha)
+gold = gold.crop(bbox)
+gold.save("hermes_logo_gold.png")
+print(f"Saved hermes_logo_gold.png ({gold.width}x{gold.height})")
