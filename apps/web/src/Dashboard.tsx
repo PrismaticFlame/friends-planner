@@ -16,8 +16,43 @@ export function Dashboard({ onLogout }: { onLogout: () => void }) {
     });
 
     const invalidate = () => qc.invalidateQueries({ queryKey: ["items"] });
-    const create = useMutation({ mutationFn: createItem, onSuccess: invalidate });
-    const remove = useMutation({ mutationFn: deleteItem, onSuccess: invalidate });
+    const create = useMutation({
+        mutationFn: createItem,
+        onMutate: async (newItem) => {
+            await qc.cancelQueries({ queryKey: ["items"] });   // stop races
+            const previous = qc.getQueryData<Item[]>(["items"]);  //snapshot for rollback
+            const optimistic: Item = {
+                id: `temp-${Date.now()}`,
+                kind: newItem.kind as Item["kind"],
+                title: newItem.title,
+                description: newItem.description ?? null,
+                status: null, start_at: null, end_at: null,
+                meta: {}, created_by: "me",
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            };
+            qc.setQueryData<Item[]>(["items"], (old = []) => [optimistic, ...old]);
+            return { previous };
+        },
+        onError: (_err, _newItem, context) => {
+            if (context?.previous) qc.setQueryData(["items"], context.previous);  //roll back
+        },
+        onSettled: () => qc.invalidateQueries({ queryKey: ["items"] }),    // resync
+    });
+
+    const remove = useMutation({
+        mutationFn: deleteItem,
+        onMutate: async (id) => {
+            await qc.cancelQueries({ queryKey: ["items"] });
+            const previous = qc.getQueryData<Item[]>(["items"]);
+            qc.setQueryData<Item[]>(["items"], (old = []) => old.filter((i) => i.id !== id))
+            return { previous };
+        },
+        onError: (_err, _id, context) => {
+            if (context?.previous) qc.setQueryData(["items"], context.previous);
+        },
+        onSettled: () => qc.invalidateQueries({ queryKey: ["items"] }),
+    });
 
     function add() {
         if (!title.trim()) return;
