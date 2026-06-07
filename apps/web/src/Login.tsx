@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login, register } from "./api";
+import logo from "./assets/hermes_logo_white.png"
 
 export function Login({ onAuthed }: { onAuthed: () => void }) {
     const [mode, setMode] = useState<"login" | "register">("login");
@@ -20,20 +21,30 @@ export function Login({ onAuthed }: { onAuthed: () => void }) {
     }
 
     return (
-        <div>
-            <h2>{mode === "login" ? "Log in" : "Sign up"}</h2>
-            <input placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} /><br />
-            {mode === "register" && (
-                <><input placeholder="display name" value={displayName}
-                         onChange={(e) => setDisplayName(e.target.value)} /><br /></>
-            )}
-            <input type="password" placeholder="password" value={password}
-                         onChange={(e) => setPassword(e.target.value)} /><br />
-            <button onClick={submit}>{mode === "login" ? "Log in" : "Sign up"}</button>
-            <button onClick={() => setMode(mode === "login" ? "register" : "login")}>
-                {mode === "login" ? "Need an account?" : "Have an account?"}
-            </button>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className="flex min-h-screen items-center justify-center px-4">
+            <div className="glass w-full max-w-sm p-8">
+                <img src={logo} alt="Hermes" className="mx-auto mb-6 h-42" />
+                <h1 className="mb-1 text-center text-2xl">{mode === "login" ? "Welcome back" : "Join Olympus"}</h1>
+                <p className="mb-6 text-center text-sm text-white/50">
+                    {mode === "login" ? "Sign in to the dashboard" : "Let your godly presence be known"}
+                </p>
+                <div className="flex flex-col gap-3">
+                    <input className="field" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    {mode === "register" && (
+                        <input className="field" placeholder="display name" value={displayName} 
+                                onChange={(e) => setDisplayName(e.target.value)} />
+                    )}
+                    <input className="field" type="password" placeholder="password" value={password} 
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && submit()} />
+                    <button className="btn mt-1" onClick={submit}>{mode === "login" ? "Log in" : "Sign up"}</button>
+                </div>
+                {error && <p className="mt-3 text-center text-sm text-red-300">{error}</p>}
+                <button onClick={() => setMode(mode === "login" ? "register" : "login")}
+                        className="mt-4 block w-full text-center text-xs text-white/50 transition hover:text-white">
+                    {mode === "login" ? "Need an account? Sign up" : "Have an account? Log in"}
+                </button>
+            </div>
         </div>
     );
 }

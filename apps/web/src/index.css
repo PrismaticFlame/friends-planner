@@ -6,7 +6,7 @@
   --color-amber:    #ff8a3d;
   --color-magenta:  #e0408a;
   --color-cyan:     #46c8ff;
-  --font-display:   "Fraunces", serif;
+  --font-display:   "Hanken Grotesk", sans-serif;
   --font-body:      "Hanken Grotesk", sans-serif;
 }
 
@@ -16,6 +16,7 @@ body {
   background: var(--color-base);
   color: rgba(255, 255, 255, 0.92);
   font-family: var(--font-body);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
@@ -70,3 +71,28 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing:
 @media (prefers-reduced-motion: reduce) {
   .blob { animation: none; }
 }
+
+.hermes-calendar {
+  --fc-border-color: rgba(255, 255, 255, 0.10);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(255, 255, 255, 0.03);
+  --fc-today-bg-color: rgba(245, 185, 66, 0.10);
+  --fc-now-indicator-color: var(--color-gold);
+
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: rgba(255, 255, 255, 0.06);
+  --fc-button-border-color: rgba(255, 255, 255, 0.14);
+  --fc-button-hover-bg-color: rgba(255, 255, 255, 0.12);
+  --fc-button-hover-border-color: rgba(255, 255, 255, 0.20);
+  --fc-button-active-bg-color: rgba(245, 185, 66, 0.92);
+  --fc-button-active-border-color: transparent;
+
+  color: rgba(255, 255, 255, 0.85);
+}
+.hermes-calendar .fc-toolbar-title { font-weight: 600; }
+.hermes-calendar .fc-col-header-cell-cushion,
+.hermes-calendar .fc-daygrid-day-number { color: rgba(255, 255, 255, 0.55); text-decoration: none; }
+.hermes-calendar .fc-button { text-transform: capitalize; font-weight: 500; box-shadow: none !important; }
+.hermes-calendar .fc-button:focus { box-shadow: none !important; }
+.hermes-calendar .fc.button-active { color: #1a1020 !important; }
+.hermes-calendar .fc-event { border-radius: 6px; padding: 1px 4px; font-size: 0.75rem; cursor: pointer; }

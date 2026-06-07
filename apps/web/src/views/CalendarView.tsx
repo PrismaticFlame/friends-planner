@@ -1,41 +1,37 @@
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import { type Item } from "../api";
 
-const dayKey = (iso: string) => 
-    new Date(iso).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+const KIND_HEX: Record<Item["kind"], string> = {
+    task: "#46c8ff", event: "#e0408a", outing: "#f5b942",
+};
 
 export function CalendarView({ items, onDelete }: { items: Item[]; onDelete: (id: string) => void }) {
-    const dated = items.filter((i) => i.start_at)
-        .sort((a, b) => a.start_at!.localeCompare(b.start_at!));
-    const undated = items.filter((i) => !i.start_at);
-
-    const groups: Record<string, Item[]> = {};
-    for (const item of dated) (groups[dayKey(item.start_at!)] ??= []).push(item);
+    const events = items
+      .filter((i) => i.start_at)
+      .map((i) => ({
+        id: i.id,
+        title: i.title,
+        start: i.start_at!,
+        end: i.end_at ?? undefined,
+        backgroundColor: KIND_HEX[i.kind],
+        borderColor: KIND_HEX[i.kind],
+      }));
 
     return (
-        <div>
-            {Object.entries(groups).map(([day, dayItems]) => (
-                <div key={day}>
-                    <h3>{day}</h3>
-                    {dayItems.map((item) => (
-                        <div key={item.id}>
-                            {new Date(item.start_at!).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
-                            {" - "}[{item.kind}] {item.title}
-                            <button onClick={() => onDelete(item.id)}>x</button>
-                        </div>
-                    ))}
-                </div>
-            ))}
-            {undated.length > 0 && (
-                <div>
-                    <h3>No date</h3>
-                    {undated.map((item) => (
-                        <div key={item.id}>
-                            [{item.kind}] {item.title}
-                            <button onClick={() => onDelete(item.id)}>x</button>
-                        </div>
-                    ))}
-                </div>
-            )}
+        <div className="hermes-calendar">
+            <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                headerToolbar={{ left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek" }}
+                events={events}
+                height="auto"
+                eventClick={(info) => {
+                    if (window.confirm(`Delete "${info.event.title}"?`)) onDelete(info.event.id);
+                }}
+            />
         </div>
     );
 }

@@ -1,22 +1,33 @@
 import { type Item } from "../api";
+import { ItemCard } from "./ItemCard";
 
-const KINDS: Item["kind"][] = ["task", "event", "outing"];
-const LABELS: Record<Item["kind"], string> = { task: "Tasks", event: "Events", outing: "Outings"};
+const COLUMNS: { kind: Item["kind"]; label: string; color: string }[] = [
+    { kind: "task", label: "Tasks", color: "var(--color-cyan)" },
+    { kind: "event", label: "Events", color: "var(--color-magenta)" },
+    { kind: "outing", label: "Outings", color: "var(--color-gold)" },
+];
 
 export function BoardView({ items, onDelete }: { items: Item[]; onDelete: (id: string) => void }) {
     return (
-        <div style={{display: "flex", gap: "1rem" }}>
-            {KINDS.map((k) => {
-                const column = items.filter((i) => i.kind === k);
+        <div className="grid gap-4 md:grid-cols-3">
+            {COLUMNS.map(({ kind, label, color }) => {
+                const column = items.filter((i) => i.kind === kind);
                 return (
-                    <div key={k} style={{ flex: 1, border: "1px solid #ccc", padding: "0.5rem" }}>
-                        <h3>{LABELS[k]} ({column.length})</h3>
-                        {column.map((item) => (
-                            <div key={item.id}>
-                                {item.title}
-                                <button onClick={() => onDelete(item.id)}>x</button>
+                    <div key={kind} className="rounded-2x1 border border-white/10 bg-white/5 p-3">
+                        <div className="mb-3 flex items-center justify-between px-1">
+                            <div className="flex items-center gap-2">
+                                <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+                                <h3 className="text-sm font-semibold text-white/90">{label}</h3>
                             </div>
-                        ))}
+                            <span className="text-xs text-white/40">{column.length}</span>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            {column.length === 0
+                              ? <p className="px-1 py-4 text-center text-xs text-white/30">Empty</p>
+                              : column.map((item) => (
+                                  <ItemCard key={item.id} item={item} onDelete={onDelete} showKind={false} showTime />
+                              ))}
+                        </div>
                     </div>
                 );
             })}
