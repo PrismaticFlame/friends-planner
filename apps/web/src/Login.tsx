@@ -24,9 +24,9 @@ export function Login({ onAuthed }: { onAuthed: () => void }) {
         <div className="flex min-h-screen items-center justify-center px-4">
             <div className="glass w-full max-w-sm p-8">
                 <img src={logo} alt="Hermes" className="mx-auto mb-6 h-42" />
-                <h1 className="mb-1 text-center text-2xl">{mode === "login" ? "Welcome back" : "Join Olympus"}</h1>
+                <h1 className="mb-1 text-center text-2xl">{mode === "login" ? "Welcome" : "Join Olympus"}</h1>
                 <p className="mb-6 text-center text-sm text-white/50">
-                    {mode === "login" ? "Sign in to the dashboard" : "Let your godly presence be known"}
+                    {mode === "login" ? "Return to Olympus" : "Let your godly presence be known"}
                 </p>
                 <div className="flex flex-col gap-3">
                     <input className="field" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -42,7 +42,7 @@ export function Login({ onAuthed }: { onAuthed: () => void }) {
                 {error && <p className="mt-3 text-center text-sm text-red-300">{error}</p>}
                 <button onClick={() => setMode(mode === "login" ? "register" : "login")}
                         className="mt-4 block w-full text-center text-xs text-white/50 transition hover:text-white">
-                    {mode === "login" ? "Need an account? Sign up" : "Have an account? Log in"}
+                    {mode === "login" ? "Require access? Create your olympic presence" : "Have an account? Log in"}
                 </button>
             </div>
         </div>
